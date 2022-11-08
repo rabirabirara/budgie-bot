@@ -21,10 +21,11 @@ impl EventHandler for Handler {     // from prelude
             return;
         }
         // needs to have a space at the end!
+        let length = content.split(' ').count();
         let echo_txt = content.split_off(6);
         if content == "!echo " {
             println!("printing: {}", echo_txt);
-            if let Err(why) = msg.channel_id.say(&ctx.http, echo_txt).await {
+            if let Err(why) = msg.channel_id.say(&ctx.http, format!("{echo_txt} {length}")).await {
                 eprintln!("Error: {:?}", why);
             }
         }
