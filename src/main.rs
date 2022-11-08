@@ -1,3 +1,4 @@
+#![feature(result_option_inspect)]
 use std::env;
 
 use serenity::prelude::*;
@@ -6,6 +7,7 @@ use serenity::{
         gateway::Ready,
         channel::Message
     },
+    utils::MessageBuilder,
     async_trait,
 };
 
@@ -16,17 +18,33 @@ impl EventHandler for Handler {     // from prelude
     // write a handler that fires whenever a message, any message, is received.
     // yes, this means discord botes technically read every single message sent! of course they have to, just like how voice assistants listen to everything you say.
     async fn message(&self, ctx: Context, msg: Message) {
-        let mut content = msg.content.clone();
-        if content.len() < 6 {
-            return;
-        }
-        // needs to have a space at the end!
-        let length = content.split(' ').count();
-        let echo_txt = content.split_off(6);
-        if content == "!echo " {
-            println!("printing: {}", echo_txt);
-            if let Err(why) = msg.channel_id.say(&ctx.http, format!("{echo_txt} {length}")).await {
-                eprintln!("Error: {:?}", why);
+        let mut command = msg.content;
+        if let Some(i) = command.find(' ') {
+            let text = command.split_off(i);
+            let response = MessageBuilder::new()
+                .push_bold_safe(&msg.author.name)
+                .push(" used ")
+                .push_mono_safe(&command)
+                .push(": ")
+                .quote_rest()
+                .push(text.clone())
+                .build();
+
+            match command.trim() {
+                "!echo" | "!say" => {
+                    if let Err(e) = msg.channel_id.say(&ctx.http, response).await {
+                        eprintln!("err: {e}");
+                    }
+                }
+                "!whisper" => {
+                    if let Err(e) = msg.channel_id.say(&ctx.http, response).await {
+                        eprintln!("err: {e}");
+                    }
+                    if let Err(e) = msg.author.dm(&ctx, |m| m.content(text)).await {
+                        eprintln!("err: {e}");
+                    }
+                }
+                _ => (),
             }
         }
     }
