@@ -1,54 +1,34 @@
-#![feature(result_option_inspect)]
+mod commands;
+mod util;
+
+use crate::util::check;
+use crate::commands::*;
 use std::env;
+
+// songbird imports
+use songbird::SerenityInit;
+
+use serenity::client::Context;
 
 use serenity::prelude::*;
 use serenity::{
-    model::{
-        gateway::Ready,
-        channel::Message
-    },
-    utils::MessageBuilder,
     async_trait,
+    framework::{
+        standard::{
+            macros::{command, group},
+            Args, CommandResult,
+        },
+        StandardFramework,
+    },
+    model::{channel::Message, gateway::Ready},
+    utils::MessageBuilder,
+    Result as SerenityResult,
 };
 
 struct Handler;
 
-#[async_trait]  // just a trait with async fns
-impl EventHandler for Handler {     // from prelude
-    // write a handler that fires whenever a message, any message, is received.
-    // yes, this means discord botes technically read every single message sent! of course they have to, just like how voice assistants listen to everything you say.
-    async fn message(&self, ctx: Context, msg: Message) {
-        let mut command = msg.content;
-        if let Some(i) = command.find(' ') {
-            let text = command.split_off(i);
-            let response = MessageBuilder::new()
-                .push_bold_safe(&msg.author.name)
-                .push(" used ")
-                .push_mono_safe(&command)
-                .push(": ")
-                .quote_rest()
-                .push(text.clone())
-                .build();
-
-            match command.trim() {
-                "!echo" | "!say" => {
-                    if let Err(e) = msg.channel_id.say(&ctx.http, response).await {
-                        eprintln!("err: {e}");
-                    }
-                }
-                "!whisper" => {
-                    if let Err(e) = msg.channel_id.say(&ctx.http, response).await {
-                        eprintln!("err: {e}");
-                    }
-                    if let Err(e) = msg.author.dm(&ctx, |m| m.content(text)).await {
-                        eprintln!("err: {e}");
-                    }
-                }
-                _ => (),
-            }
-        }
-    }
-
+#[async_trait] // just a trait with async fns
+impl EventHandler for Handler {
     // write a handler that fires when the bot starts up - specifically, on a "ready" signal from discord.
     // the context is passed in but not really necessary.  instead, the ready struct is useful.
     async fn ready(&self, _: Context, ready: Ready) {
@@ -56,21 +36,36 @@ impl EventHandler for Handler {     // from prelude
     }
 }
 
+// Create a GENERAL_GROUP of commands.
+#[group]
+#[commands(join, say, whisper, tts)]
+struct General;
 
 #[tokio::main]
 async fn main() {
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+    
+    let framework = StandardFramework::new()
+        .configure(|c| c.prefix("!"))
+        .group(&GENERAL_GROUP);
 
     // intents are just events that your bot should receive.
-    let intents = GatewayIntents::GUILD_MESSAGES
-        | GatewayIntents::DIRECT_MESSAGES
+    let intents = GatewayIntents::non_privileged()
         | GatewayIntents::MESSAGE_CONTENT;
     
-    // the Client 
-    let mut client = Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
-
-    // start a shard and start the bot listening to events!
-    if let Err(why) = client.start().await {
-        eprintln!("Client error: {:?}", why);
-    }
+    // the Client
+    let mut client = Client::builder(&token, intents)
+        .event_handler(Handler)
+        .framework(framework)
+        .register_songbird()
+        .await
+        .expect("Err creating client");
+    
+    // set up ctrl-c handler
+    tokio::spawn(async move {
+        let _ = client.start().await.map_err(|why| println!("Client ended: {:?}", why));
+    });
+    
+    let _ = tokio::signal::ctrl_c().await;
+    println!("Received Ctrl-C, shutting down.");    
 }
