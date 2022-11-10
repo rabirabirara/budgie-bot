@@ -1,9 +1,10 @@
 mod commands;
 mod util;
 
-use crate::util::check;
+use crate::util::*;
 use crate::commands::*;
-use std::env;
+use std::fs;
+use std::path::Path;
 use dotenv;
 use songbird::SerenityInit;
 use serenity::client::Context;
@@ -12,14 +13,11 @@ use serenity::{
     async_trait,
     framework::{
         standard::{
-            macros::{command, group},
-            Args, CommandResult,
+            macros::group,
         },
         StandardFramework,
     },
-    model::{channel::Message, gateway::Ready},
-    utils::MessageBuilder,
-    Result as SerenityResult,
+    model::gateway::Ready,
 };
 
 struct Handler;
@@ -35,7 +33,7 @@ impl EventHandler for Handler {
 
 // Create a GENERAL_GROUP of commands.
 #[group]
-#[commands(join, leave, say, echo, whisper, tts)]
+#[commands(join, leave, say, repeat, echo, whisper)]
 struct General;
 
 #[tokio::main]
@@ -66,5 +64,18 @@ async fn main() {
     });
     
     let _ = tokio::signal::ctrl_c().await;
+    
+    // delete the last audio file
+    if Path::new(DEFAULT_AUDIO_FILENAME).exists() {
+        if let Err(e) = fs::remove_file(DEFAULT_AUDIO_FILENAME) {
+            println!("Failed to remove audio file: {e}");
+        } else {
+            println!("Successfully removed last audio file.")
+        }
+    } else {
+        println!("No audio file was or is present.")
+    }
+    
+    // leave the voice channel, if in one right now
     println!("Received Ctrl-C, shutting down.");    
 }
