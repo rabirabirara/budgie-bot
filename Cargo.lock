@@ -467,6 +467,7 @@ name = "discord_simple_tts_bot"
 version = "0.1.0"
 dependencies = [
  "dotenv",
+ "gtts",
  "serenity",
  "songbird",
  "tokio",
@@ -734,6 +735,16 @@ name = "glob"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b919933a397b79c37e33b77bb2aa3dc8eb6e165ad809e58ff75bc7db2e34574"
+
+[[package]]
+name = "gtts"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f785ab31571bf2f9ace5388f5754a144e4ff89130baf939fdda94993129eed7e"
+dependencies = [
+ "minreq",
+ "percent-encoding",
+]
 
 [[package]]
 name = "h2"
@@ -1061,6 +1072,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "96590ba8f175222643a85693f33d26e9c8a015f599c216509b1a6894af675d34"
 dependencies = [
  "adler",
+]
+
+[[package]]
+name = "minreq"
+version = "2.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4c785bc6027fd359756e538541c8624012ba3776d3d3fe123885643092ed4132"
+dependencies = [
+ "lazy_static",
+ "log",
+ "rustls",
+ "webpki",
+ "webpki-roots",
 ]
 
 [[package]]

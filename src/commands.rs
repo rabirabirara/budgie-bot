@@ -1,4 +1,8 @@
-use crate::util::check;
+use crate::util::{
+    check,
+    DEFAULT_AUDIO_FILENAME,
+};
+use gtts;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -27,6 +31,37 @@ pub async fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult
 
 #[command]
 pub async fn say(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
+    // TODO: write the msg to a file and then say it.
+    if !gtts::save_to_file(args.message(), DEFAULT_AUDIO_FILENAME) {
+        eprintln!("failed to get GTTS audio and save it.");
+        return Ok(());
+    }
+    
+    let guild = msg.guild(&ctx.cache).unwrap();
+    let guild_id = guild.id;
+    
+    let manager = songbird::get(&ctx).await.expect("songbird client inits at start");
+    if let Some(handler_lock) = manager.get(guild_id) {
+        let mut handler = handler_lock.lock().await;
+        let source = match songbird::ffmpeg(DEFAULT_AUDIO_FILENAME).await {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("failed to play audio from file: {e}");
+                return Ok(());
+            }
+        };
+        
+        handler.play_source(source);        
+        // msg.say playing
+    } else {
+        // TODO: msg.say this
+        eprintln!("Not in a voice channel");
+    }
+    Ok(())
+}
+
+#[command]
+pub async fn echo(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     check(msg.channel_id.say(&ctx.http, args.message()).await);
     Ok(())    
 }

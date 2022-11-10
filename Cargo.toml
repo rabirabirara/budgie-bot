@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 dotenv = "0.15.0"
+gtts = "0.1.0"
 # serenity = "0.11"
 serenity = { version = "0.11", default-features = true }
 songbird = "0.3.0"

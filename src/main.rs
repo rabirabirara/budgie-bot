@@ -4,12 +4,8 @@ mod util;
 use crate::util::check;
 use crate::commands::*;
 use std::env;
-
-// songbird imports
 use songbird::SerenityInit;
-
 use serenity::client::Context;
-
 use serenity::prelude::*;
 use serenity::{
     async_trait,
@@ -38,7 +34,7 @@ impl EventHandler for Handler {
 
 // Create a GENERAL_GROUP of commands.
 #[group]
-#[commands(join, say, whisper, tts)]
+#[commands(join, say, echo, whisper, tts)]
 struct General;
 
 #[tokio::main]
