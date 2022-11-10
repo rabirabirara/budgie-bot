@@ -4,6 +4,7 @@ mod util;
 use crate::util::check;
 use crate::commands::*;
 use std::env;
+use dotenv;
 use songbird::SerenityInit;
 use serenity::client::Context;
 use serenity::prelude::*;
@@ -34,12 +35,14 @@ impl EventHandler for Handler {
 
 // Create a GENERAL_GROUP of commands.
 #[group]
-#[commands(join, say, echo, whisper, tts)]
+#[commands(join, leave, say, echo, whisper, tts)]
 struct General;
 
 #[tokio::main]
 async fn main() {
-    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+    dotenv::dotenv().expect("should have the .env file in the environment");
+    let token = dotenv::var("DISCORD_TOKEN").expect("correct the .env file with the discord token!");
+    // let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
     
     let framework = StandardFramework::new()
         .configure(|c| c.prefix("!"))

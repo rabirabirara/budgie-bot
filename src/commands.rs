@@ -19,13 +19,22 @@ pub async fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult
         .get(&msg.author.id) 
         .and_then(|vst| vst.channel_id) 
     {
-        let manager = songbird::get(&ctx).await
-            .expect("songbird client inits at startup?");
+        let manager = songbird::get(&ctx).await.ok_or("songbird client missing")?;
         let _handler = manager.join(guild_id, channel_id).await;
     } else {
         check(msg.channel_id.say(&ctx.http, "You need to be in a voice channel for this to work!").await);
     }
     
+    Ok(())
+}
+
+#[command]
+pub async fn leave(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
+    let guild = msg.guild(&ctx.cache).unwrap();
+    let guild_id = guild.id;
+    
+    let manager = songbird::get(&ctx).await.ok_or("songbird client missing")?;
+    manager.remove(guild_id).await?;
     Ok(())
 }
 

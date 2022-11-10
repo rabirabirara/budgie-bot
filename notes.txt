@@ -1,0 +1,5 @@
+
+add options to change voice and rate
+add permission: only person who called for bot (and admins) can disconnect it
+add a little more interactivity and responsiveness
+	: do not add a noisy, chatty bot - just have the bot say things
