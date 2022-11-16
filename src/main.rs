@@ -85,6 +85,6 @@ async fn main() {
         println!("No audio file was or is present.")
     }
     
-    // leave the voice channel, if in one right now
+    // TODO: leave the voice channel, if in one right now
     println!("Received Ctrl-C, shutting down.");    
 }
