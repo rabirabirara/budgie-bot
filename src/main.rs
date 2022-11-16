@@ -17,13 +17,19 @@ use serenity::{
         },
         StandardFramework,
     },
-    model::gateway::Ready,
+    model::{
+        gateway::Ready,
+        channel::Message,
+    }
 };
 
 struct Handler;
 
 #[async_trait] // just a trait with async fns
 impl EventHandler for Handler {
+    async fn message(&self, ctx: Context, msg: Message) {
+        // if allsay is on, then trigger a tts whenever 
+    }
     // write a handler that fires when the bot starts up - specifically, on a "ready" signal from discord.
     // the context is passed in but not really necessary.  instead, the ready struct is useful.
     async fn ready(&self, _: Context, ready: Ready) {

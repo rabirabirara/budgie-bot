@@ -1,5 +1,13 @@
 
 add options to change voice and rate
-add permission: only person who called for bot (and admins) can disconnect it
+
+add permissions: only person who called for bot (and admins) can disconnect it
+	: need to save state somehow
+add allsay for the person who triggers it
+
+add a help command
 add a little more interactivity and responsiveness
 	: do not add a noisy, chatty bot - just have the bot say things
+	
+add sharding code
+	: just for serenity, just in case.
