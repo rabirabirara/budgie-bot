@@ -23,13 +23,11 @@ use serenity::{
     }
 };
 
+
 struct Handler;
 
 #[async_trait] // just a trait with async fns
 impl EventHandler for Handler {
-    async fn message(&self, ctx: Context, msg: Message) {
-        // if allsay is on, then trigger a tts whenever 
-    }
     // write a handler that fires when the bot starts up - specifically, on a "ready" signal from discord.
     // the context is passed in but not really necessary.  instead, the ready struct is useful.
     async fn ready(&self, _: Context, ready: Ready) {
@@ -39,7 +37,7 @@ impl EventHandler for Handler {
 
 // Create a GENERAL_GROUP of commands.
 #[group]
-#[commands(join, leave, say, repeat, echo, whisper)]
+#[commands(join, leave, say, repeat, echo, whisper, parrot)]
 struct General;
 
 #[tokio::main]
@@ -49,7 +47,11 @@ async fn main() {
     // let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
     
     let framework = StandardFramework::new()
-        .configure(|c| c.prefix("!"))
+        .configure(|c| c
+            .prefix("!")
+            //.owners()
+        )
+        .normal_message(normal_message)
         .group(&GENERAL_GROUP);
 
     // intents are just events that your bot should receive.
@@ -60,6 +62,7 @@ async fn main() {
     let mut client = Client::builder(&token, intents)
         .event_handler(Handler)
         .framework(framework)
+        .type_map_insert::<WhoseParrot>(None)    // initialize parrot
         .register_songbird()
         .await
         .expect("Err creating client");

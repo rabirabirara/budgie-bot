@@ -11,3 +11,6 @@ add a little more interactivity and responsiveness
 	
 add sharding code
 	: just for serenity, just in case.
+
+see 
+https://docs.rs/sapi-lite/latest/sapi_lite/
