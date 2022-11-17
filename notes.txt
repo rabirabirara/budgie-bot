@@ -14,3 +14,7 @@ add sharding code
 
 see 
 https://docs.rs/sapi-lite/latest/sapi_lite/
+
+see
+https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/get-started-text-to-speech?pivots=programming-language-cli&tabs=windows%2Cterminal
+for info on the ML generated voices

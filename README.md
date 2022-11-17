@@ -22,8 +22,11 @@ on any messages you send.
 
 # Ways of improving this bot
 
+- translate this bot to python so that we can integrate AI text generation more easily.
 - add permissions and user detection: only one user can use parrot at a time (first come first serve), and all other users' messages should be ignored
 - let users use the bot even while not in call, so they can be in one call but pester another
 - add the use of different voices
 - add a settings framework (database) that allows users to set their voice profile, i.e. voice, rate, pitch
 - stop using google TTS and use a real TTS library, with a respectable voice; if higher quality TTS is slower, give users the options to choose either in their voice profile
+- add the ML part of the bot
+  - this was actually a separate bot idea, but it makes more sense if a parrot bot actually parrots what you say.
